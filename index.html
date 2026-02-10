@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanic Survival Classifier - TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@latest"></script>
+    <script src="app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #1a73e8;
+        }
+        section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0d62c9;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .metrics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .metric-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            min-width: 200px;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider {
+            width: 100%;
+        }
+        .data-preview {
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .note {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        @media (max-width: 768px) {
+            .metrics-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Titanic Survival Classifier with TensorFlow.js</h1>
+        
+        <section id="data-load">
+            <h2>1. Data Load</h2>
+            <p>Upload the training and test CSV files from the Titanic dataset:</p>
+            <div>
+                <label for="train-file">Training Data (train.csv):</label>
+                <input type="file" id="train-file" accept=".csv">
+            </div>
+            <div>
+                <label for="test-file">Test Data (test.csv):</label>
+                <input type="file" id="test-file" accept=".csv">
+            </div>
+            <button id="load-data-btn" onclick="loadData()">Load Data</button>
+            <div id="data-status"></div>
+        </section>
+
+        <section id="inspect">
+            <h2>2. Data Inspection</h2>
+            <button id="inspect-btn" onclick="inspectData()" disabled>Inspect Data</button>
+            <div id="data-preview" class="data-preview"></div>
+            <div id="data-stats"></div>
+            <div id="charts"></div>
+        </section>
+
+        <section id="preprocessing">
+            <h2>3. Preprocessing</h2>
+            <button id="preprocess-btn" onclick="preprocessData()" disabled>Preprocess Data</button>
+            <div>
+                <label>
+                    <input type="checkbox" id="add-family-features" checked>
+                    Add Family Features (FamilySize, IsAlone)
+                </label>
+            </div>
+            <div id="preprocessing-output"></div>
+        </section>
+
+        <section id="model">
+            <h2>4. Model Setup</h2>
+            <button id="create-model-btn" onclick="createModel()" disabled>Create Model</button>
+            <div id="model-summary"></div>
+        </section>
+
+        <section id="training">
+            <h2>5. Training</h2>
+            <button id="train-btn" onclick="trainModel()" disabled>Train Model</button>
+            <div id="training-status"></div>
+            <div id="training-vis"></div>
+        </section>
+
+        <section id="metrics">
+            <h2>6. Evaluation Metrics</h2>
+            <div class="slider-container">
+                <label for="threshold-slider">Classification Threshold (for ROC curve):</label>
+                <input type="range" id="threshold-slider" class="slider" min="0" max="1" step="0.01" value="0.5" disabled>
+                <span id="threshold-value">0.5</span>
+            </div>
+            <div id="metrics-output" class="metrics-container">
+                <div class="metric-card">
+                    <h3>Confusion Matrix</h3>
+                    <div id="confusion-matrix"></div>
+                </div>
+                <div class="metric-card">
+                    <h3>Performance Metrics</h3>
+                    <div id="performance-metrics"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="prediction">
+            <h2>7. Prediction</h2>
+            <button id="predict-btn" onclick="predict()" disabled>Predict on Test Data</button>
+            <div id="prediction-output"></div>
+        </section>
+
+        <section id="export">
+            <h2>8. Export Results</h2>
+            <button id="export-btn" onclick="exportResults()" disabled>Export Results</button>
+            <div id="export-status"></div>
+        </section>
+
+        <section id="deployment">
+            <h2>Deployment Notes</h2>
+            <div class="note">
+                <p>To deploy this application:</p>
+                <ol>
+                    <li>Create a public GitHub repository</li>
+                    <li>Commit index.html and app.js to the repository</li>
+                    <li>Enable GitHub Pages in repository settings (select main branch and root folder)</li>
+                    <li>Your app will be available at: https://[your-username].github.io/[repository-name]</li>
+                </ol>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
